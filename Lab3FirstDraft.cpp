@@ -19,9 +19,37 @@ class Wire{
   void SetInputLogic(int LogicToSet);
   void SetAsInputWire();
   int LogicLevel; // Initialised to UNDEF // Needs to be public in order to be controlled by a gate
+  bool CheckIfInput();
 
   private:
   bool IsInputWire; // Initiased to False
   std::string Name;
 
 };
+
+bool Wire::CheckIfInput(){
+  if (IsInputWire == true){
+    return true;
+  }
+  else{
+    return false;
+  }
+};
+
+Wire::Wire(std::string NameToSet){
+  Name = NameToSet;
+  IsInputWire = false;
+  LogicLevel = UNDEF;
+}
+
+Wire::~Wire(){}
+
+void Wire::SetInputLogic(int LogicToSet){
+  if(IsInputWire){
+    LogicLevel = LogicToSet;
+  }
+}
+
+void Wire::SetAsInputWire(){
+  IsInputWire = true;
+}
