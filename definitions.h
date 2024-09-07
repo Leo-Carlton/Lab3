@@ -3,8 +3,12 @@
 
 
 #include <iostream>
-#include <string>
 #include <vector>
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 
 const int LOW = 0;
 const int HIGH = 1;
