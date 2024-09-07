@@ -3,6 +3,14 @@
 #include "wire.h"
 #include "gate.h"
 
+Wire* Circuit::GetWireByName(const std::string& Name) {
+    return WireMap[Name];
+}
+
+Gate* Circuit::GetGateByName(const std::string& Name) {
+    return GateMap[Name];
+}
+
 void Circuit::ComputeOutputs(){
   NumDefinedGates = 0;
   while (NumDefinedGates != NumGates){
@@ -21,11 +29,74 @@ Circuit::Circuit(){
   NumInputWires = 0;
   NumOutputGates = 0;
   NumDefinedGates = 0;
+
+    std::ifstream infile("input.txt");
+    std::string line;
+
+    while (std::getline(infile, line)) {
+        std::istringstream iss(line);
+        std::string command;
+        iss >> command;
+
+        if (command == "CONSTRUCT") {
+            std::string objectType, objectName;
+            iss >> objectType >> objectName;
+            if (objectType == "WIRE") {
+                AddWire(objectName);
+                std::cout << "Constructing Wire" << std::endl;
+            } else {
+                if (objectType == "ANDGATE"){
+                    AddGate(0, objectName);
+                    std::cout << "Constructing AndGate" << std::endl;
+                }
+                if (objectType == "ORGATE"){
+                    AddGate(1, objectName);
+                    std::cout << "Constructing OrGate" << std::endl;
+                }
+                if (objectType == "XORGATE"){
+                    AddGate(2, objectName);
+                    std::cout << "Constructing XorGate" << std::endl;
+                }
+                if (objectType == "NOTGATE"){
+                    AddGate(3, objectName);
+                    std::cout << "Constructing NotGate" << std::endl;
+                }
+             // Further if branching needed for the different gates
+                // Put Construct Gate function, with the arg as the name
+            }
+        } 
+        else if (command == "SET") {
+            std::string objectName, property;
+            iss >> objectName >> property;
+            if (property == "INPUT") {
+                SetInputWire(objectName);
+                std::cout << "Setting "<< objectName << " as Input" << std::endl;
+            } else if (property == "OUTPUT") {
+                SetOutputGate(objectName);
+                std::cout << "Setting " << objectName <<  " as Output" << std::endl;
+            }
+        } else if (command == "CONNECT") {
+            std::string objectType, source, to, target;
+            iss >> objectType >> source >> to >> target;
+            if (objectType == "WIRE") {
+                ConnectInputWire(source, target);
+                std::cout << "Connecting " << source << " to " <<  target << std::endl;
+            }
+            if (objectType == "GATE") {
+                std::string NumWiresString = std::to_string(NumWires);
+                AddWire(NumWiresString);
+                ConnectGates(NumWiresString,source,target);
+                std::cout << "Connecting " << source << " to " <<  target << std::endl;
+            }
+        }
+    }
+
 }
 
 Circuit::~Circuit(){}
 
-void Circuit::SetOutputGate(*Gate gate) {
+void Circuit::SetOutputGate(const std::string& GateName) {
+    Gate* gate = GetGateByName(GateName);
     if (gate) {
         gate->SetAsOutputGate();
         OutputGates.push_back(gate);
@@ -33,7 +104,8 @@ void Circuit::SetOutputGate(*Gate gate) {
     }
 }
 
-void Circuit::SetInputWire(Wire* wire) {
+void Circuit::SetInputWire(const std::string& WireName) {
+    Wire* wire = GetWireByName(WireName);
     if (wire) {
         wire->SetAsInputWire();
         InputWires.push_back(wire);
@@ -41,7 +113,11 @@ void Circuit::SetInputWire(Wire* wire) {
     }
 }
 
-void Circuit::ConnectGates(Wire* wire, Gate* gateProvidingOutput, Gate* gateToInput) {
+void Circuit::ConnectGates(const std::string& WireName, const std::string& GateProvidingOutputName, const std::string& GateToInputName) {
+    Wire* wire = GetWireByName(WireName);
+    Gate* gateProvidingOutput = GetGateByName(GateProvidingOutputName);
+    Gate* gateToInput = GetGateByName(GateToInputName);
+
     if (wire && gateProvidingOutput && gateToInput) {
         gateProvidingOutput->SetOutputWire(*wire);
 
@@ -58,7 +134,9 @@ void Circuit::ConnectGates(Wire* wire, Gate* gateProvidingOutput, Gate* gateToIn
     }
 }
 
-void Circuit::ConnectInputWire(Wire* wire, Gate* gate) {
+void Circuit::ConnectInputWire(const std::string& WireName, const std::string& GateName) {
+    Wire* wire = GetWireByName(WireName);
+    Gate* gate = GetGateByName(GateName);
 
     if (wire && gate) {
         // Check if the gate is a NOT gate
