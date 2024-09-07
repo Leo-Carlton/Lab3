@@ -3,6 +3,7 @@
 
 
 #include <iostream>
+#include <string>
 
 const int LOW = 0;
 const int HIGH = 1;
