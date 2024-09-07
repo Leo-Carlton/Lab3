@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 const int LOW = 0;
 const int HIGH = 1;
