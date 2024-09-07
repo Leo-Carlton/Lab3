@@ -18,14 +18,18 @@ class Circuit{
   public:
   Circuit(); //This will intialise everything, then read the text file to build a circuit 
   ~Circuit();
-  void AddGate(*Gate);
-  void AddWire(*Wire);
-  void ConnectGates(*Wire WireToUse, *Gate GateProvidingOutput, Gate* GateToInput); // Can connect the output of one gate as the input of another gate 
-  void ConnectInputWire(Wire* WireToUse, Gate* GateToConnect); // Basic Connect wire 
-  void SetOutputGate(Gate* Gate); 
-  void SetInputWire(Wire* Wire);
+  void AddGate(int type, std::string NameToSet);
+  void AddWire(std::string NameToSet);
+  void ConnectGates(const std::string& WireName, const std::string& GateProvidingOutputName, const std::string& GateToInputName); // Can connect the output of one gate as the input of another gate 
+  void ConnectInputWire(const std::string& WireName, const std::string& GateName); // Basic Connect wire 
+  void SetOutputGate(const std::string& GateName); 
+  void SetInputWire(const std::string& WireName);
 
   void ComputeOutputs();
+
+  Wire* GetWireByName(const std::string& Name);
+  Gate* GetGateByName(const std::string& Name);
+
 
   int NumInputWires;
 
@@ -37,7 +41,12 @@ class Circuit{
 
   private:
 
+  std::map<std::string, Wire*> WireMap;
+  std::map<std::string, Gate*> GateMap;
+
   int NumGates;
+
+
 
   std::vector<Wire*> CircuitWires; // Vector of Wires
   std::vector<Gate*> CircuitGates; // Vector of Gates
